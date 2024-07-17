@@ -12,12 +12,12 @@ usernames = {}
 # Broadcast messages to all clients
 def broadcast(message, sender_client=None):
     for client in clients:
-        if client != sender_client:
-            try:
-                client.send(message)
-            except:
-                client.close()
-                remove_client(client)
+        # if client != sender_client:
+        try:
+            client.send(message)
+        except:
+            client.close()
+            remove_client(client)
 
 # Handle messages from clients
 def handle_client(client):
