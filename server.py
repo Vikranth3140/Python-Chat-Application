@@ -7,27 +7,35 @@ server.bind(('localhost', 12345))
 server.listen()
 
 clients = []
-usernames = []
+usernames = {}
 
 # Broadcast messages to all clients
-def broadcast(message):
+def broadcast(message, sender_client=None):
     for client in clients:
-        client.send(message)
+        # if client != sender_client:
+        try:
+            client.send(message)
+        except:
+            client.close()
+            remove_client(client)
 
 # Handle messages from clients
 def handle_client(client):
     while True:
         try:
             message = client.recv(1024)
-            broadcast(message)
+            if message:
+                broadcast(message, client)
         except:
-            index = clients.index(client)
-            clients.remove(client)
-            client.close()
-            username = usernames[index]
-            broadcast(f'{username} has left the chat!'.encode('utf-8'))
-            usernames.remove(username)
+            remove_client(client)
             break
+
+def remove_client(client):
+    if client in clients:
+        clients.remove(client)
+    if client in usernames:
+        username = usernames.pop(client)
+        broadcast(f'{username} has left the chat!'.encode('utf-8'))
 
 # Receive connections from clients
 def receive_connections():
@@ -37,12 +45,11 @@ def receive_connections():
 
         client.send('USERNAME'.encode('utf-8'))
         username = client.recv(1024).decode('utf-8')
-        usernames.append(username)
+        usernames[client] = username
         clients.append(client)
 
         print(f'Username of the client is {username}')
         broadcast(f'{username} has joined the chat!'.encode('utf-8'))
-        client.send('Connected to the server!'.encode('utf-8'))
 
         thread = threading.Thread(target=handle_client, args=(client,))
         thread.start()
