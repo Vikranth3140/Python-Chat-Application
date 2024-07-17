@@ -28,15 +28,25 @@ def write_messages(event=None):
         message = f'{recipient} {private_message}'
     else:
         message = f'{username}: {message}'
-    client.send(message.encode('utf-8'))
+    try:
+        client.send(message.encode('utf-8'))
+    except:
+        print('An error occurred!')
+        client.close()
 
 def on_typing(event=None):
-    typing_message = f"{username} is typing..."
-    client.send(typing_message.encode('utf-8'))
+    try:
+        typing_message = f"{username} is typing..."
+        client.send(typing_message.encode('utf-8'))
+    except:
+        pass
 
 def stop_typing(event=None):
-    typing_message = f"{username} stopped typing."
-    client.send(typing_message.encode('utf-8'))
+    try:
+        typing_message = f"{username} stopped typing."
+        client.send(typing_message.encode('utf-8'))
+    except:
+        pass
 
 # GUI setup
 root = tkinter.Tk()
