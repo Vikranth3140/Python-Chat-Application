@@ -29,6 +29,21 @@ def send_message(event=None):
     if message:
         message = f'{username}: {message}'
         client.send(message.encode('utf-8'))
+        stop_typing()
+
+def on_typing(event=None):
+    try:
+        typing_message = f"{username} is typing..."
+        client.send(typing_message.encode('utf-8'))
+    except:
+        pass
+
+def stop_typing(event=None):
+    try:
+        typing_message = f"{username} stopped typing."
+        client.send(typing_message.encode('utf-8'))
+    except:
+        pass
 
 # GUI setup
 root = tkinter.Tk()
@@ -47,6 +62,8 @@ scrollbar.config(command=chat_box.yview)
 message_entry = tkinter.StringVar()
 entry_field = tkinter.Entry(root, textvariable=message_entry)
 entry_field.bind("<Return>", send_message)
+entry_field.bind("<KeyPress>", on_typing)
+entry_field.bind("<KeyRelease>", stop_typing)
 entry_field.pack(padx=10, pady=10)
 
 send_button = tkinter.Button(root, text="Send", command=send_message)
